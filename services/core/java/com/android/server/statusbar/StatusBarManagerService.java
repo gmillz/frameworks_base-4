@@ -92,6 +92,7 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
     private boolean mShowImeSwitcher;
     private IBinder mImeToken = null;
     private int mCurrentUserId;
+    private boolean mPanelRevealed = false;
 
     private class DisableRecord implements IBinder.DeathRecipient {
         int userId;
@@ -909,6 +910,7 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
         long identity = Binder.clearCallingIdentity();
         try {
             mNotificationDelegate.onPanelRevealed(clearNotificationEffects, numItems);
+            mPanelRevealed = true;
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
@@ -931,6 +933,7 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
         long identity = Binder.clearCallingIdentity();
         try {
             mNotificationDelegate.onPanelHidden();
+            mPanelRevealed = false;
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
@@ -1015,6 +1018,10 @@ public class StatusBarManagerService extends IStatusBarService.Stub {
         } finally {
             Binder.restoreCallingIdentity(identity);
         }
+    }
+
+    public boolean panelRevealed() {
+        return mPanelRevealed;
     }
 
     @Override
