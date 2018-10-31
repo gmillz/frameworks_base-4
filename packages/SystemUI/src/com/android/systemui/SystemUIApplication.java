@@ -39,6 +39,7 @@ import com.android.systemui.statusbar.phone.StatusBar;
 import com.android.systemui.statusbar.phone.StatusBarWindowManager;
 import com.android.systemui.util.NotificationChannels;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -126,7 +127,10 @@ public class SystemUIApplication extends Application implements SysUiServiceProv
 
     public void startServicesIfNeeded() {
         String[] names = getResources().getStringArray(R.array.config_systemUIServiceComponents);
-        startServicesIfNeeded(names);
+        String elmyra = getResources().getString(R.string.config_systemUIElmyraService);
+        String[] finalNames = Arrays.copyOf(names, names.length + 1);
+        finalNames[names.length] = elmyra;
+        startServicesIfNeeded(finalNames);
     }
 
     /**

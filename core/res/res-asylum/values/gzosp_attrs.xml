@@ -22,6 +22,7 @@
         <attr name="defaultAction" format="string" />
         <attr name="allowDisable" format="boolean" />
         <attr name="supportsMultipleActions" format="boolean" />
+        <attr name="wakeKey" format="boolean" />>
         <attr name="icon" format="reference" />
         <attr name="order" format="integer" />
     </declare-styleable>
