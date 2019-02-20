@@ -45,6 +45,7 @@ java_library_static {
         "android.hardware.contexthub-V1.0-java",
         "com.asylum.actions",
         "com.asylum.core",
+        "com.asylum.keys",
     ],
 }
 

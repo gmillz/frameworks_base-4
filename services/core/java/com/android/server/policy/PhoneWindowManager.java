@@ -305,6 +305,8 @@ import java.lang.reflect.Constructor;
 
 import dalvik.system.PathClassLoader;
 
+import com.asylum.keys.HardwareKeyHandler;
+
 /**
  * WindowManagerPolicy implementation for the Android phone UI.  This
  * introduces a new method suffix, Lp, for an internal lock of the
@@ -597,6 +599,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     boolean mWakeGestureEnabledSetting;
     MyWakeGestureListener mWakeGestureListener;
+
+    private HardwareKeyHandler mHardwareKeyHandler;
 
     // Default display does not rotate, apps that require non-default orientation will have to
     // have the orientation emulated.
@@ -2317,6 +2321,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         mGlobalKeyManager = new GlobalKeyManager(mContext);
 
+        mHardwareKeyHandler = new HardwareKeyHandler(mContext, mHandler);
+
         // Controls rotation and the like.
         initializeHdmiState();
 
@@ -2476,9 +2482,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         mNavBarEnabled = Settings.System.getIntForUser(resolver,
                 Settings.System.NAVIGATION_BAR_ENABLED, defaultToNavigationBar ? 1 : 0,
                         UserHandle.USER_CURRENT) == 1;
-        if (mDeviceHardwareKeys != 0) {
-            SystemProperties.set("qemu.hw.mainkeys", mNavBarEnabled ? "0" : "1");
-        }
+        SystemProperties.set("qemu.hw.mainkeys", mNavBarEnabled ? "0" : "1");
 
         // Allow a system property to override this. Used by the emulator.
         // See also hasNavigationBar().
@@ -2599,12 +2603,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     Settings.System.BUTTON_BRIGHTNESS_ENABLED, 0, UserHandle.USER_CURRENT) == 1;
             if (navBarEnabled != mNavBarEnabled) {
                 mNavBarEnabled = navBarEnabled;
-                if (mDeviceHardwareKeys != 0) {
-                    SystemProperties.set("qemu.hw.mainkeys", mNavBarEnabled ? "0" : "1");
-                    if (!mNavBarEnabled && buttonBrightnessEnabled) {
-                        Settings.System.putInt(resolver,
-                                Settings.System.BUTTON_BRIGHTNESS_ENABLED, 0);
-                    }
+                SystemProperties.set("qemu.hw.mainkeys", mNavBarEnabled ? "0" : "1");
+                if (!mNavBarEnabled && buttonBrightnessEnabled) {
+                    Settings.System.putInt(resolver,
+                            Settings.System.BUTTON_BRIGHTNESS_ENABLED, 0);
                 }
             }
 
@@ -3716,6 +3718,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     + repeatCount + " keyguardOn=" + keyguardOn + " mHomePressed=" + mHomePressed
                     + " canceled=" + canceled);
         }
+
+
 
         // If we think we might have a volume down & power key chord on the way
         // but we're not sure, then tell the dispatcher to wait a little while and
@@ -6173,6 +6177,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         final int keyCode = event.getKeyCode();
 
         final boolean isInjected = (policyFlags & WindowManagerPolicy.FLAG_INJECTED) != 0;
+        final boolean virtualKey = event.getDeviceId() == KeyCharacterMap.VIRTUAL_KEYBOARD;
 
         // If screen is off then we treat the case where the keyguard is open but hidden
         // the same as if it were open and in front.
@@ -6187,6 +6192,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             Log.d(TAG, "interceptKeyTq keycode=" + keyCode
                     + " interactive=" + interactive + " keyguardActive=" + keyguardActive
                     + " policyFlags=" + Integer.toHexString(policyFlags));
+        }
+
+        if (mHardwareKeyHandler != null && !virtualKey) {
+            if (mHardwareKeyHandler.handleKeyEvent(event, keyguardActive, interactive)) {
+                return 0;
+            }
         }
 
         // Basic policy based on interactive state.
