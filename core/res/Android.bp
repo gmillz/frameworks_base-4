@@ -19,6 +19,8 @@ android_app {
     no_framework_libs: true,
     certificate: "platform",
 
+    resource_dirs: [ "res", "res-asylum" ],
+
     // Soong special-cases framework-res to install this alongside
     // the libraries at /system/framework/framework-res.apk.
 
