@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<keys xmlns:android="http://schemas.android.com/apk/res-auto">
+    <!--<key-category
+        android:name="Touchscreen Gestures"
+        android:key="touchscreen_gestures">
+        <key
+            android:name="@string/gesture_arrow_down_title"
+            android:path="/proc/touchpanel/down_arrow_enable"
+            android:scancode="252"
+            android:defaultAction="**ring_vib_silent**" />
+        <key
+            android:name="@string/gesture_arrow_left_title"
+            android:path="/proc/touchpanel/left_arrow_enable"
+            android:scancode="253"
+            android:defaultAction="**media_previous**" />
+        <key
+            android:name="@string/gesture_arrow_right_title"
+            android:path="/proc/touchpanel/right_arrow_enable"
+            android:scancode="254"
+            android:defaultAction="**media_next**" />
+        <key
+            android:name="@string/gesture_arrow_up_title"
+            android:path="/proc/touchpanel/up_arrow_enable"
+            android:scancode="255"
+            android:defaultAction="**torch**" />
+        <key
+            android:name="@string/gesture_circle_title"
+            android:path="/proc/touchpanel/letter_o_enable"
+            android:scancode="250"
+            android:defaultAction="**camera**" />
+        <key
+            android:name="@string/gesture_double_swipe_title"
+            android:path="/proc/touchpanel/double_swipe_enable"
+            android:scancode="251"
+            android:defaultAction="**media_play_pause**" />
+    </key-category>
+
+    <key-category
+        android:name="Buttons"
+        android:key="hardware_keys">
+        <key
+            android:name="Back"
+            android:scancode="10101"
+            android:defaultAction="**back**" />
+        <key
+            android:name="Home"
+            android:scancode="10101"
+            android:defaultAction="**home**" />
+        <key
+            android:name="Recents"
+            android:scancode="10101"
+            android:defaultAction="**recents**" />
+    </key-category>-->
+</keys>
