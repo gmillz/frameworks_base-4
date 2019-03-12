@@ -410,6 +410,9 @@ public class NotificationManagerService extends SystemService {
     private MetricsLogger mMetricsLogger;
     private Predicate<String> mAllowedManagedServicePackages;
 
+    /** Is changing zen mode allowed */
+    private boolean mSliderZenModeLock = false;
+
     private static class Archive {
         final int mBufferSize;
         final ArrayDeque<StatusBarNotification> mBuffer;
@@ -2939,6 +2942,17 @@ public class NotificationManagerService extends SystemService {
         }
 
         @Override
+        public void setZenModeWithLock(int mode, Uri conditionId, String reason, boolean lock) {
+            enforceSystemOrSystemUI("INotificationManager.setZenModeWithLock");
+            final long identity = Binder.clearCallingIdentity();
+            try {
+                mZenModeHelper.setManualZenModeWithLock(mode, conditionId, null, reason, lock);
+            } finally {
+                Binder.restoreCallingIdentity(identity);
+            }
+        }
+
+        @Override
         public void setZenMode(int mode, Uri conditionId, String reason) throws RemoteException {
             enforceSystemOrSystemUI("INotificationManager.setZenMode");
             final long identity = Binder.clearCallingIdentity();
@@ -3020,7 +3034,9 @@ public class NotificationManagerService extends SystemService {
             if (zen == -1) throw new IllegalArgumentException("Invalid filter: " + filter);
             final long identity = Binder.clearCallingIdentity();
             try {
-                mZenModeHelper.setManualZenMode(zen, null, pkg, "setInterruptionFilter");
+                if (!mSliderZenModeLock) {
+                    mZenModeHelper.setManualZenMode(zen, null, pkg, "setInterruptionFilter");
+                }
             } finally {
                 Binder.restoreCallingIdentity(identity);
             }

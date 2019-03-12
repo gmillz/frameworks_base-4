@@ -39,6 +39,7 @@ import android.os.ServiceManager;
 import android.os.StrictMode;
 import android.os.UserHandle;
 import android.provider.Settings.Global;
+import android.provider.Settings.System;
 import android.service.notification.StatusBarNotification;
 import android.service.notification.ZenModeConfig;
 import android.util.Log;
@@ -92,6 +93,9 @@ import java.util.Objects;
 public class NotificationManager {
     private static String TAG = "NotificationManager";
     private static boolean localLOGV = false;
+
+    /** Is changing zen mode allowed */
+    private boolean mSliderZenModeLock = false;
 
     /**
      * Intent that is broadcast when an application is blocked or unblocked.
@@ -666,12 +670,26 @@ public class NotificationManager {
     /**
      * @hide
      */
-    public void setZenMode(int mode, Uri conditionId, String reason) {
+    public void setZenModeWithLock(int mode, Uri conditionId, String reason, boolean lock) {
         INotificationManager service = getService();
         try {
-            service.setZenMode(mode, conditionId, reason);
+            service.setZenModeWithLock(mode, conditionId, reason, lock);
         } catch (RemoteException e) {
             throw e.rethrowFromSystemServer();
+        }
+    }
+
+    /**
+     * @hide
+     */
+    public void setZenMode(int mode, Uri conditionId, String reason) {
+        if (!mSliderZenModeLock) {
+            INotificationManager service = getService();
+            try {
+                service.setZenMode(mode, conditionId, reason);
+            } catch (RemoteException e) {
+                throw e.rethrowFromSystemServer();
+            }
         }
     }
 

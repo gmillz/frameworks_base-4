@@ -121,7 +121,10 @@ public class ZenModeHelper {
 
     protected String mDefaultRuleEveryNightName;
     protected String mDefaultRuleEventsName;
-    @VisibleForTesting protected boolean mIsBootComplete;
+    @VisibleForTesting
+    protected boolean mIsBootComplete;
+    
+    private boolean mZenModeLock;
 
     public ZenModeHelper(Context context, Looper looper, ConditionProviders conditionProviders) {
         mContext = context;
@@ -502,12 +505,20 @@ public class ZenModeHelper {
 
     protected AutomaticZenRule createAutomaticZenRule(ZenRule rule) {
         return new AutomaticZenRule(rule.name, rule.component, rule.conditionId,
-                NotificationManager.zenModeToInterruptionFilter(rule.zenMode), rule.enabled,
-                rule.creationTime);
+                NotificationManager.zenModeToInterruptionFilter(rule.zenMode), rule.enabled, rule.creationTime);
+    }
+    
+    public void setManualZenModeWithLock(int zenMode, Uri conditionId,
+            String caller, String reason, boolean lock) {
+        mZenModeLock = false;
+        setManualZenMode(zenMode, conditionId, caller, reason);
+        mZenModeLock = lock;
     }
 
     public void setManualZenMode(int zenMode, Uri conditionId, String caller, String reason) {
-        setManualZenMode(zenMode, conditionId, reason, caller, true /*setRingerMode*/);
+        if (!mZenModeLock) {
+            setManualZenMode(zenMode, conditionId, reason, caller, true /*setRingerMode*/);
+        }
         Settings.Global.putInt(mContext.getContentResolver(), Global.SHOW_ZEN_SETTINGS_SUGGESTION,
                 0);
     }

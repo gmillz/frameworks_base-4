@@ -18,6 +18,7 @@ package com.android.server.notification;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
+import android.net.Uri;
 
 public interface NotificationManagerInternal {
     NotificationChannel getNotificationChannel(String pkg, int uid, String channelId);
