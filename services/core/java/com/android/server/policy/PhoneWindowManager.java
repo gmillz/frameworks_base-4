@@ -6177,7 +6177,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         final int keyCode = event.getKeyCode();
 
         final boolean isInjected = (policyFlags & WindowManagerPolicy.FLAG_INJECTED) != 0;
-        final boolean virtualKey = event.getDeviceId() == KeyCharacterMap.VIRTUAL_KEYBOARD;
+        final boolean isAsylumSource = event.getSource() == InputDevice.SOURCE_ASYLUM;
 
         // If screen is off then we treat the case where the keyguard is open but hidden
         // the same as if it were open and in front.
@@ -6194,7 +6194,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     + " policyFlags=" + Integer.toHexString(policyFlags));
         }
 
-        if (mHardwareKeyHandler != null && !virtualKey) {
+        if (mHardwareKeyHandler != null && !isAsylumSource) {
             if (mHardwareKeyHandler.handleKeyEvent(event, keyguardActive, interactive)) {
                 return 0;
             }
