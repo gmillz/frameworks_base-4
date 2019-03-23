@@ -318,7 +318,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     static final String TAG = "WindowManager";
     static final boolean DEBUG = false;
     static final boolean localLOGV = false;
-    static final boolean DEBUG_INPUT = false;
+    static final boolean DEBUG_INPUT = true;
     static final boolean DEBUG_KEYGUARD = false;
     static final boolean DEBUG_LAYOUT = false;
     static final boolean DEBUG_SPLASH_SCREEN = false;
@@ -6191,12 +6191,19 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if (DEBUG_INPUT) {
             Log.d(TAG, "interceptKeyTq keycode=" + keyCode
                     + " interactive=" + interactive + " keyguardActive=" + keyguardActive
-                    + " policyFlags=" + Integer.toHexString(policyFlags));
+                    + " policyFlags=" + Integer.toHexString(policyFlags)
+                    + " isAsylumSource=" + isAsylumSource + " down=" + down);
         }
 
         if (mHardwareKeyHandler != null && !isAsylumSource) {
             if (mHardwareKeyHandler.handleKeyEvent(event, keyguardActive, interactive)) {
+                if (DEBUG_INPUT) {
+                    Log.d(TAG, "Handled by Asylum, stopping here for now");
+                }
                 return 0;
+            }
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "Not handled by Asylum, continuing...");
             }
         }
 
@@ -6205,12 +6212,18 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         boolean isWakeKey = (policyFlags & WindowManagerPolicy.FLAG_WAKE) != 0
                 || event.isWakeKey();
         if (interactive || (isInjected && !isWakeKey)) {
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "if (interactive || (isInjected && !isWakeKey)) - Entering");
+            }
             // When the device is interactive or the key is injected pass the
             // key to the application.
             result = ACTION_PASS_TO_USER;
             isWakeKey = false;
 
             if (interactive) {
+                if (DEBUG_INPUT) {
+                    Log.d(TAG, "if (interactive || (isInjected && !isWakeKey)) - if (interactive) - Entering");
+                }
                 // If the screen is awake, but the button pressed was the one that woke the device
                 // then don't pass it to the application
                 if (keyCode == mPendingWakeKey && !down) {
@@ -6218,8 +6231,14 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 }
                 // Reset the pending key
                 mPendingWakeKey = PENDING_KEY_NULL;
+                if (DEBUG_INPUT) {
+                    Log.d(TAG, "if (interactive || (isInjected && !isWakeKey)) - if (interactive) - Leaving");
+                }
             }
         } else if (!interactive && shouldDispatchInputWhenNonInteractive(event)) {
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "if (!interactive && shouldDispatchInputWhenNonInteractive(event)) - Entering");
+            }
             // If we're currently dozing with the screen on and the keyguard showing, pass the key
             // to the application but preserve its wake key status to make sure we still move
             // from dozing to fully interactive if we would normally go from off to fully
@@ -6227,7 +6246,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             result = ACTION_PASS_TO_USER;
             // Since we're dispatching the input, reset the pending key
             mPendingWakeKey = PENDING_KEY_NULL;
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "if (!interactive && shouldDispatchInputWhenNonInteractive(event)) - Leaving");
+            }
         } else {
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "else (1) - Entering");
+            }
             // When the screen is off and the key is not injected, determine whether
             // to wake the device but don't pass the key to the application.
             result = 0;
@@ -6238,15 +6263,24 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (isWakeKey && down) {
                 mPendingWakeKey = keyCode;
             }
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "else (1) - Leaving");
+            }
         }
 
         // If the key would be handled globally, just return the result, don't worry about special
         // key processing.
         if (isValidGlobalKey(keyCode)
                 && mGlobalKeyManager.shouldHandleGlobalKey(keyCode, event)) {
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "if (isValidGlobalKey(keyCode)... - Entering");
+            }
             if (isWakeKey) {
                 wakeUp(event.getEventTime(), mAllowTheaterModeWakeFromKey,
                        "android.policy:KEY", true);
+            }
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "if (isValidGlobalKey(keyCode)... - Leaving, result=" + result);
             }
             return result;
         }
@@ -6261,19 +6295,31 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         // Specific device key handling
         if (mDeviceKeyHandler != null) {
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "DeviceHandler - Entering");
+            }
             try {
                 // The device only should consume known keys.
                 if (mDeviceKeyHandler.handleKeyEvent(event)) {
+                    if (DEBUG_INPUT) {
+                        Log.d(TAG, "DeviceHandler - Handling");
+                    }
                     return 0;
                 }
             } catch (Exception e) {
                 Slog.w(TAG, "Could not dispatch event to device key handler", e);
+            }
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "DeviceHandler - Leaving");
             }
         }
 
         // Handle special keys.
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK: {
+                if (DEBUG_INPUT) {
+                    Log.d(TAG, "switch (keyCode) = KEYCODE_BACK - Entering");
+                }
                 if (down) {
                     interceptBackKeyDown();
                 } else {
@@ -6283,6 +6329,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     if (handled) {
                         result &= ~ACTION_PASS_TO_USER;
                     }
+                }
+                if (DEBUG_INPUT) {
+                    Log.d(TAG, "switch (keyCode) = KEYCODE_BACK - Leaving");
                 }
                 break;
             }
@@ -6568,6 +6617,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 break;
             }
         }
+        if (DEBUG_INPUT) {
+            Log.d(TAG, "switch (keyCode) - Leaving");
+        }
 
         if (useHapticFeedback) {
             performHapticFeedbackLw(null, HapticFeedbackConstants.VIRTUAL_KEY, false);
@@ -6576,6 +6628,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         if (isWakeKey) {
             wakeUp(event.getEventTime(), mAllowTheaterModeWakeFromKey, "android.policy:KEY",
                     event.getKeyCode() == KeyEvent.KEYCODE_WAKEUP); // Check prox only on wake key
+        }
+
+        if (DEBUG_INPUT) {
+            Log.d(TAG, "interceptKeyBeforeQueueing - Leaving, result=" + result);
         }
 
         return result;
