@@ -69,4 +69,11 @@
         android:title="@string/navbar_editor_title"
         android:summary="@string/navbar_editor_summary"
         android:fragment="com.android.systemui.tuner.NavBarEditor" />
+
+    <PreferenceScreen
+        android:key="navigation_keys_dimmer"
+        android:title="@string/navigation_keys_dimmer_title"
+        android:summary="@string/navigation_keys_dimmer_summary"
+        android:fragment="com.android.systemui.tuner.NavigationKeysDimmerFragment" />
+
 </PreferenceScreen>

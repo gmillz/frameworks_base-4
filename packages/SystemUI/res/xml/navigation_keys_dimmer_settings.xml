@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2018 Yank555.lu Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:systemui="http://schemas.android.com/apk/res-auto"
+        android:key="navigation_keys_dimmer_settings"
+        android:title="@string/navigation_keys_dimmer_title">
+
+     <SwitchPreference
+            android:key="navigation_keys_always_dim"
+            android:title="@string/navigation_keys_always_dim_title"
+            android:summaryOn="@string/navigation_keys_always_dim_summary_on"
+            android:summaryOff="@string/navigation_keys_always_dim_summary_off"
+            android:persistent="false" />
+
+    <com.android.systemui.tuner.CustomSeekBarPreference
+            android:key="navigation_keys_lightsin_alpha"
+            android:title="@string/navigation_keys_lightsin_alpha_title"
+            android:summary="@string/navigation_keys_lightsin_alpha_summary"
+            systemui:maximum="100"
+            systemui:minimum="0"
+            systemui:interval="1"
+            systemui:units="%"
+            android:persistent="false" />
+
+    <com.android.systemui.tuner.CustomSeekBarPreference
+            android:key="navigation_keys_lightsout_alpha"
+            android:title="@string/navigation_keys_lightsout_alpha_title"
+            android:summary="@string/navigation_keys_lightsout_alpha_summary"
+            systemui:maximum="100"
+            systemui:minimum="0"
+            systemui:interval="1"
+            systemui:units="%"
+            android:persistent="false" />
+
+    <com.android.systemui.tuner.CustomSeekBarPreference
+            android:key="navigation_keys_lightsin_duration"
+            android:title="@string/navigation_keys_lightsin_duration_title"
+            android:summary="@string/navigation_keys_lightsin_duration_summary"
+            systemui:maximum="10000"
+            systemui:minimum="0"
+            systemui:interval="50"
+            systemui:units="ms"
+            android:persistent="false" />
+
+    <com.android.systemui.tuner.CustomSeekBarPreference
+            android:key="navigation_keys_lightsout_delay"
+            android:title="@string/navigation_keys_lightsout_delay_title"
+            android:summary="@string/navigation_keys_lightsout_delay_summary"
+            systemui:maximum="10000"
+            systemui:minimum="0"
+            systemui:interval="50"
+            systemui:units="ms"
+            android:persistent="false" />
+
+    <com.android.systemui.tuner.CustomSeekBarPreference
+            android:key="navigation_keys_lightsout_duration"
+            android:title="@string/navigation_keys_lightsout_duration_title"
+            android:summary="@string/navigation_keys_lightsout_duration_summary"
+            systemui:maximum="10000"
+            systemui:minimum="0"
+            systemui:interval="50"
+            systemui:units="ms"
+            android:persistent="false" />
+
+</PreferenceScreen>

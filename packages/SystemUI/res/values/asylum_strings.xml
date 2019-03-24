@@ -105,4 +105,21 @@
     <!-- SysUI Tuner: Label for icon shaped like a notification [CHAR LIMIT=60] -->
     <string name="tuner_notifications">Notification</string>
 
+    <!-- Navigation Bar Dimmer Customizations -->
+    <string name="navigation_keys_dimmer_title">Navigation bar dimmer options</string>
+    <string name="navigation_keys_dimmer_summary">Customize how the navigation bar is dimmed</string>
+    <string name="navigation_keys_always_dim_title">Always dim navigation bar</string>
+    <string name="navigation_keys_always_dim_summary_on">Navigation bar will always be dimmed, also when wallpaper is visible</string>
+    <string name="navigation_keys_always_dim_summary_off">Navigation bar will only be dimmed if wallpaper is not visible (default)</string>
+    <string name="navigation_keys_lightsin_alpha_title">Opacity when not dimmed (bright)</string>
+    <string name="navigation_keys_lightsin_alpha_summary">Opacity between 0% (invisible) and 100% (default 100%)</string>
+    <string name="navigation_keys_lightsout_alpha_title">Opacity when dimmed (dark)</string>
+    <string name="navigation_keys_lightsout_alpha_summary">Opacity between 0% (invisible) and 100% (default 60%)</string>
+    <string name="navigation_keys_lightsin_duration_title">Fade in animation duration (dark -> bright)</string>
+    <string name="navigation_keys_lightsin_duration_summary">Duration in ms for the fade in animation (default 250)</string>
+    <string name="navigation_keys_lightsout_duration_title">Fade out animation duration (bright -> dark)</string>
+    <string name="navigation_keys_lightsout_duration_summary">Duration in ms for the fade out animation (default 1500)</string>
+    <string name="navigation_keys_lightsout_delay_title">Fade out delay</string>
+    <string name="navigation_keys_lightsout_delay_summary">Duration in ms before starting the fade out animation (default 2000)</string>
+
 </resources>
