@@ -16,10 +16,14 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.ContentObserver;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.UserHandle;
+import android.provider.Settings;
 import android.util.SparseArray;
 import android.view.Display;
 import android.view.IWallpaperVisibilityListener;
@@ -40,16 +44,29 @@ public final class NavigationBarTransitions extends BarTransitions {
     private final boolean mAllowAutoDimWallpaperNotVisible;
     private boolean mWallpaperVisible;
 
+    private final Context mContext;
+
+    private final Handler mHandler = new Handler();
+
     private boolean mLightsOut;
     private boolean mAutoDim;
     private View mNavButtons;
 
+    private boolean mNavButtonsAlwaysDim;
+
+    private float mNavButtonsAlphaLightsIn;
+    private float mNavButtonsAlphaLightsOut;
+
+    private int mDurationLightsIn;
+    private int mDurationLightsOut;
+
     public NavigationBarTransitions(NavigationBarView view) {
         super(view, R.drawable.nav_background);
         mView = view;
+        mContext = view.getContext();
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
-        mLightTransitionsController = new LightBarTransitionsController(view.getContext(),
+        mLightTransitionsController = new LightBarTransitionsController(mContext,
                 this::applyDarkIntensity);
         mAllowAutoDimWallpaperNotVisible = view.getContext().getResources()
                 .getBoolean(R.bool.config_navigation_bar_enable_auto_dim_no_visible_wallpaper);
@@ -80,6 +97,11 @@ public final class NavigationBarTransitions extends BarTransitions {
         if (currentView != null) {
             mNavButtons = currentView.findViewById(R.id.nav_buttons);
         }
+
+        // Settings observer
+        SettingsObserver mSettingsObserver = new SettingsObserver(mHandler);
+        mSettingsObserver.observe();
+        mSettingsObserver.updateSettings();
     }
 
     public void init() {
@@ -97,7 +119,7 @@ public final class NavigationBarTransitions extends BarTransitions {
     @Override
     protected boolean isLightsOut(int mode) {
         return super.isLightsOut(mode) || (mAllowAutoDimWallpaperNotVisible && mAutoDim
-                && !mWallpaperVisible && mode != MODE_WARNING);
+                && (!mWallpaperVisible || mNavButtonsAlwaysDim) && mode != MODE_WARNING);
     }
 
     public LightBarTransitionsController getLightTransitionsController() {
@@ -126,12 +148,14 @@ public final class NavigationBarTransitions extends BarTransitions {
 
         // Bump percentage by 10% if dark.
         float darkBump = mLightTransitionsController.getCurrentDarkIntensity() / 10;
-        final float navButtonsAlpha = lightsOut ? 0.6f + darkBump : 1f;
+        final float navButtonsAlpha = lightsOut
+                    ? mNavButtonsAlphaLightsOut + darkBump 
+                    : mNavButtonsAlphaLightsIn;
 
         if (!animate) {
             mNavButtons.setAlpha(navButtonsAlpha);
         } else {
-            final int duration = lightsOut ? LIGHTS_OUT_DURATION : LIGHTS_IN_DURATION;
+            final int duration = lightsOut ? mDurationLightsOut : mDurationLightsIn;
             mNavButtons.animate()
                 .alpha(navButtonsAlpha)
                 .setDuration(duration)
@@ -172,4 +196,69 @@ public final class NavigationBarTransitions extends BarTransitions {
             return false;
         }
     };
+
+    /**
+     * Settingsobserver to take care of the user settings.
+     */
+    private class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_KEYS_ALWAYS_DIM),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_KEYS_LIGHTSIN_ALPHA),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_KEYS_LIGHTSOUT_ALPHA),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_KEYS_LIGHTSIN_DURATION),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_KEYS_LIGHTSOUT_DURATION),
+                    false, this, UserHandle.USER_ALL);
+            updateSettings();
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            updateSettings();
+        }
+
+        public void updateSettings() {
+            ContentResolver resolver = mContext.getContentResolver();
+            // Always dim navigation bar (also when wallpaper is visible)
+            mNavButtonsAlwaysDim = Settings.System.getIntForUser(resolver,
+                    Settings.System.NAVIGATION_KEYS_ALWAYS_DIM,
+                    0,
+                    UserHandle.USER_CURRENT) == 1;
+            // Navigation bar lights in transparency (aka. non-dimmed)
+            mNavButtonsAlphaLightsIn = (float) Settings.System.getIntForUser(resolver,
+                    Settings.System.NAVIGATION_KEYS_LIGHTSIN_ALPHA,
+                    100,
+                    UserHandle.USER_CURRENT) / 100;
+            // Navigation bar lights out transparency (aka. dimmed)
+            mNavButtonsAlphaLightsOut = (float) Settings.System.getIntForUser(resolver,
+                    Settings.System.NAVIGATION_KEYS_LIGHTSOUT_ALPHA,
+                    60,
+                    UserHandle.USER_CURRENT) / 100;
+            // Navigation bar lights in animation duration (aka. dimmed -> non-dimmed)
+            mDurationLightsIn = Settings.System.getIntForUser(resolver,
+                    Settings.System.NAVIGATION_KEYS_LIGHTSIN_DURATION,
+                    LIGHTS_IN_DURATION,
+                    UserHandle.USER_CURRENT);
+            // Navigation bar lights out animation duration (aka. non-dimmed -> dimmed)
+            mDurationLightsOut = Settings.System.getIntForUser(resolver,
+                    Settings.System.NAVIGATION_KEYS_LIGHTSOUT_DURATION,
+                    LIGHTS_OUT_DURATION,
+                    UserHandle.USER_CURRENT);
+            reapplyDarkIntensity();
+        }
+    }
 }

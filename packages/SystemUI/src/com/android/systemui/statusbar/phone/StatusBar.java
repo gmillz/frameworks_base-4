@@ -37,6 +37,7 @@ import static com.android.systemui.statusbar.phone.BarTransitions.MODE_SEMI_TRAN
 import static com.android.systemui.statusbar.phone.BarTransitions.MODE_TRANSLUCENT;
 import static com.android.systemui.statusbar.phone.BarTransitions.MODE_TRANSPARENT;
 import static com.android.systemui.statusbar.phone.BarTransitions.MODE_WARNING;
+import static com.android.systemui.statusbar.phone.BarTransitions.LIGHTS_IN_DURATION;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -305,7 +306,7 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     private static final int STATUS_OR_NAV_TRANSIENT =
             View.STATUS_BAR_TRANSIENT | View.NAVIGATION_BAR_TRANSIENT;
-    private static final long AUTOHIDE_TIMEOUT_MS = 2250;
+    private static final int AUTOHIDE_TIMEOUT_MS = 2000;
 
     /**
      * The delay to reset the hint text when the hint animation is finished running.
@@ -341,6 +342,9 @@ public class StatusBar extends SystemUI implements DemoMode,
      * libhwui.
      */
     private static final float SRC_MIN_ALPHA = 0.002f;
+
+    private int mDurationLightsIn;
+    private int mAutoHideTimeout;
 
     static {
         boolean onlyCoreApps;
@@ -689,6 +693,12 @@ public class StatusBar extends SystemUI implements DemoMode,
         mPowerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
 
         mDeviceProvisionedController = Dependency.get(DeviceProvisionedController.class);
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.NAVIGATION_KEYS_LIGHTSIN_DURATION), false,
+                mNavBarDimmerObserver);
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.NAVIGATION_KEYS_LIGHTSOUT_DELAY), false,
+                mNavBarDimmerObserver);
 
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
@@ -724,6 +734,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         mContext.registerReceiver(mWallpaperChangedReceiver, wallpaperChangedFilter);
         mWallpaperChangedReceiver.onReceive(mContext, null);
 
+        mNavBarDimmerObserver.onChange(false); // set up
         mLockscreenUserManager.setUpWithPresenter(this, mEntryManager);
         mCommandQueue.disable(switches[0], switches[6], false /* animate */);
         setSystemUiVisibility(switches[1], switches[7], switches[8], 0xffffffff,
@@ -783,6 +794,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         // Lastly, call to the icon policy to install/update all the icons.
         mIconPolicy = new PhoneStatusBarPolicy(mContext, mIconController);
         mSignalPolicy = new StatusBarSignalPolicy(mContext, mIconController);
+
+        mNavBarDimmerObserver.onChange(false); // set up
 
         mUnlockMethodCache = UnlockMethodCache.getInstance(mContext);
         mUnlockMethodCache.addListener(this);
@@ -2712,7 +2725,7 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     private void scheduleAutohide() {
         cancelAutohide();
-        mHandler.postDelayed(mAutohide, AUTOHIDE_TIMEOUT_MS);
+        mHandler.postDelayed(mAutohide, mAutoHideTimeout + mDurationLightsIn);
     }
 
     public void touchAutoDim() {
@@ -2721,7 +2734,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
         mHandler.removeCallbacks(mAutoDim);
         if (mState != StatusBarState.KEYGUARD && mState != StatusBarState.SHADE_LOCKED) {
-            mHandler.postDelayed(mAutoDim, AUTOHIDE_TIMEOUT_MS);
+            mHandler.postDelayed(mAutoDim, mAutoHideTimeout + mDurationLightsIn);
         }
     }
 
@@ -5127,6 +5140,22 @@ public class StatusBar extends SystemUI implements DemoMode,
                     );
                 }
             }
+        }
+    };
+
+    protected final ContentObserver mNavBarDimmerObserver = new ContentObserver(mHandler) {
+        @Override
+        public void onChange(boolean selfChange) {
+            // Navigation bar lights in animation duration (aka. dimmed -> non-dimmed)
+            mDurationLightsIn = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.NAVIGATION_KEYS_LIGHTSIN_DURATION,
+                    LIGHTS_IN_DURATION,
+                    UserHandle.USER_CURRENT);
+            // Navigation bar lights out delay
+            mAutoHideTimeout = Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.NAVIGATION_KEYS_LIGHTSOUT_DELAY,
+                    AUTOHIDE_TIMEOUT_MS,
+                    UserHandle.USER_CURRENT);
         }
     };
 

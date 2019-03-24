@@ -4170,6 +4170,54 @@ public final class Settings {
          */
         public static final String BUTTON_BRIGHTNESS_ENABLED = "button_brightness_enabled";
 
+        /**
+         * Always dim navigation bar (also when wallpaper is visible)
+         *
+         * Type: int (0 for false, 1 for true)
+         * @hide
+         */
+        public static final String NAVIGATION_KEYS_ALWAYS_DIM = "navigation_keys_always_dim";
+
+        /**
+         * Navigation bar lights in transparency (aka. non-dimmed)
+         *
+         * Type: int (0 - 100)
+         * @hide
+         */
+        public static final String NAVIGATION_KEYS_LIGHTSIN_ALPHA = "navigation_keys_lightsin_alpha";
+
+        /**
+         * Navigation bar lights out transparency (aka. dimmed)
+         *
+         * Type: int (0 - 100)
+         * @hide
+         */
+        public static final String NAVIGATION_KEYS_LIGHTSOUT_ALPHA = "navigation_keys_lightsout_alpha";
+
+        /**
+         * Navigation bar lights in animation duration (aka. dimmed -> non-dimmed)
+         *
+         * Type: int (ms)
+         * @hide
+         */
+        public static final String NAVIGATION_KEYS_LIGHTSIN_DURATION = "navigation_keys_lightsin_duration";
+
+        /**
+         * Navigation bar lights out animation duration (aka. non-dimmed -> dimmed)
+         *
+         * Type: int (ms)
+         * @hide
+         */
+        public static final String NAVIGATION_KEYS_LIGHTSOUT_DURATION = "navigation_keys_lightsout_duration";
+
+        /**
+         * Navigation bar lights out delay
+         *
+         * Type: int (ms)
+         * @hide
+         */
+        public static final String NAVIGATION_KEYS_LIGHTSOUT_DELAY = "navigation_keys_lightsout_delay";
+
         /** @hide */
         private static final Validator BUTTON_BRIGHTNESS_ENABLED_VALIDATOR = BOOLEAN_VALIDATOR;
 
