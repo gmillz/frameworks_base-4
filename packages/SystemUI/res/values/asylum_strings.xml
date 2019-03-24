@@ -34,4 +34,75 @@
     <!-- Content description of the do not disturb tile in quick settings when off (not shown on the screen). [CHAR LIMIT=NONE] -->
     <string name="accessibility_quick_settings_dnd_off">Do not disturb off.</string>
 
+    <!-- NavBar -->
+    <!-- Power Key -->
+    <string name="power">Power</string>
+    <string name="accessibility_power">Power button</string>
+
+    <!-- Menu big Key -->
+    <string name="menu_big">Menu Big</string>
+    <string name="accessibility_menu_big">Menu Big button</string>
+
+    <!-- Search Key -->
+    <string name="search">Search</string>
+    <string name="accessibility_search">Search button</string>
+
+    <!-- Left/Right Cursor Keys -->
+    <string name="ime_left">IME Left</string>
+    <string name="accessibility_ime_left">IME Left button</string>
+    <string name="ime_right">IME Right</string>
+    <string name="accessibility_ime_right">IME Right button</string>
+
+    <!-- SysUI Tuner: Labels for different types of navigation bar buttons [CHAR LIMIT=60] -->
+    <string-array name="nav_bar_ext_buttons">
+        <item>Search</item>
+        <item>IME Left</item>
+        <item>IME Right</item>
+        <item>Clipboard</item>
+        <item>Keycode</item>
+        <item>Keyboard switcher</item>
+        <item>None</item>
+    </string-array>
+    <string-array name="nav_bar_ext_button_values" translatable="false">
+        <item>search</item>
+        <item>ime_left</item>
+        <item>ime_right</item>
+        <item>clipboard</item>
+        <item>key</item>
+        <item>menu_ime</item>
+        <item>space</item>
+    </string-array>
+
+    <!-- SysUI Tuner: Labels for different types of navigation bar layouts [CHAR LIMIT=60] -->
+    <string-array name="nav_bar_ext_layouts">
+        <item>Normal</item>
+        <item>Compact</item>
+        <item>Left-leaning</item>
+        <item>Right-leaning</item>
+        <item>Extended (incl. power, menu and cursor keys)</item>
+    </string-array>
+
+    <string-array name="nav_bar_ext_layouts_values" translatable="false">
+        <item>default</item>
+        <item>left;back,home,recent;right</item>
+        <item>left,back,home,recent,right;space;space</item>
+        <item>space;space;left,back,home,recent,right</item>
+        <item>ime_left;power,back,home,recent,menu_big;ime_right</item>
+    </string-array>
+
+    <!-- SysUI Tuner: Label for icon shaped like a stop [CHAR LIMIT=60] -->
+    <string name="tuner_null">Empty</string>
+
+    <!-- SysUI Tuner: Label for icon shaped like a power [CHAR LIMIT=60] -->
+    <string name="tuner_power">Power</string>
+
+    <!-- SysUI Tuner: Label for icon shaped like a search [CHAR LIMIT=60] -->
+    <string name="tuner_search">Search</string>
+
+    <!-- SysUI Tuner: Label for icon shaped like a camera [CHAR LIMIT=60] -->
+    <string name="tuner_camera">Camera</string>
+
+    <!-- SysUI Tuner: Label for icon shaped like a notification [CHAR LIMIT=60] -->
+    <string name="tuner_notifications">Notification</string>
+
 </resources>

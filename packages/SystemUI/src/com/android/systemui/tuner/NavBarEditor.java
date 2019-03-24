@@ -63,7 +63,6 @@ import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.KEY
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.KEY_CODE_END;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.KEY_CODE_START;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.KEY_IMAGE_DELIM;
-import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.MENU_IME_ROTATE;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.NAVSPACE;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.NAV_BAR_VIEWS;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.RECENT;
@@ -71,8 +70,11 @@ import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.SIZ
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.SIZE_MOD_START;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.WEIGHT_SUFFIX;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.WEIGHT_CENTERED_SUFFIX;
-import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.LEFT;
-import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.RIGHT;
+import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.MENU_BIG;
+import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.IME_LEFT;
+import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.IME_RIGHT;
+import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.POWER;
+import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.SEARCH;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.extractButton;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.extractSize;
 
@@ -180,16 +182,20 @@ public class NavBarEditor extends TunerPreferenceFragment implements TunerServic
             return context.getString(R.string.accessibility_recent);
         } else if (button.startsWith(NAVSPACE)) {
             return context.getString(R.string.space);
-        } else if (button.startsWith(LEFT)) {
-            return context.getString(R.string.left);
-        } else if (button.startsWith(RIGHT)) {
-            return context.getString(R.string.right);
-        /*} else if (button.equals(MENU_IME_ROTATE)) {
-            return context.getString(R.string.menu_ime);*/
-        /*} else if (button.startsWith(CLIPBOARD)) {
-            return context.getString(R.string.clipboard);*/
-        /*} else if (button.startsWith(KEY)) {
-            return context.getString(R.string.keycode);*/
+        } else if (button.startsWith(CLIPBOARD)) {
+            return context.getString(R.string.clipboard);
+        } else if (button.startsWith(KEY)) {
+            return context.getString(R.string.keycode);
+        } else if (button.startsWith(MENU_BIG)) {
+            return context.getString(R.string.menu_big);
+        } else if (button.startsWith(POWER)) {
+            return context.getString(R.string.power);
+        } else if (button.startsWith(IME_LEFT)) {
+            return context.getString(R.string.ime_left);
+        } else if (button.startsWith(IME_RIGHT)) {
+            return context.getString(R.string.ime_right);
+        } else if (button.startsWith(SEARCH)) {
+            return context.getString(R.string.search);
         }
         return button;
     }
@@ -231,11 +237,11 @@ public class NavBarEditor extends TunerPreferenceFragment implements TunerServic
         }
     }
 
-    /*private void selectImage() {
+    private void selectImage() {
         startActivityForResult(KeycodeSelectionHelper.getSelectImageIntent(), READ_REQUEST);
-    }*/
+    }
 
-    /*@Override
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == READ_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             final Uri uri = data.getData();
@@ -245,7 +251,7 @@ public class NavBarEditor extends TunerPreferenceFragment implements TunerServic
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
-    }*/
+    }
 
     private class NavBarAdapter extends RecyclerView.Adapter<Holder>
             implements View.OnClickListener {
@@ -408,7 +414,8 @@ public class NavBarEditor extends TunerPreferenceFragment implements TunerServic
 
         private void showAddDialog(final Context context) {
             final String[] options = new String[] {
-                    BACK, HOME, RECENT, NAVSPACE, LEFT, RIGHT
+                    BACK, HOME, RECENT, MENU_BIG, POWER, IME_LEFT, IME_RIGHT, SEARCH, CLIPBOARD,
+                    KEY, NAVSPACE
             };
             final CharSequence[] labels = new CharSequence[options.length];
             for (int i = 0; i < options.length; i++) {
@@ -419,23 +426,23 @@ public class NavBarEditor extends TunerPreferenceFragment implements TunerServic
                     .setItems(labels, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            /*if (KEY.equals(options[which])) {
+                            if (KEY.equals(options[which])) {
                                 showKeyDialogs(context);
-                            } else {*/
+                            } else {
                                 int index = mButtons.size() - 1;
-                                //showAddedMessage(context, options[which]);
+                                showAddedMessage(context, options[which]);
                                 mButtons.add(index, options[which]);
                                 mLabels.add(index, labels[which]);
 
                                 notifyItemInserted(index);
                                 notifyChanged();
-                            //}
+                            }
                         }
                     }).setNegativeButton(android.R.string.cancel, null)
                     .show();
         }
 
-        /*private void onImageSelected(Uri uri) {
+        private void onImageSelected(Uri uri) {
             int index = mButtons.size() - 1;
             mButtons.add(index, KEY + KEY_CODE_START + mKeycode + KEY_IMAGE_DELIM + uri.toString()
                     + KEY_CODE_END);
@@ -443,9 +450,9 @@ public class NavBarEditor extends TunerPreferenceFragment implements TunerServic
 
             notifyItemInserted(index);
             notifyChanged();
-        }*/
+        }
 
-        /*private void showKeyDialogs(final Context context) {
+        private void showKeyDialogs(final Context context) {
             final KeycodeSelectionHelper.OnSelectionComplete listener =
                     new KeycodeSelectionHelper.OnSelectionComplete() {
                         @Override
@@ -463,9 +470,9 @@ public class NavBarEditor extends TunerPreferenceFragment implements TunerServic
                             KeycodeSelectionHelper.showKeycodeSelect(context, listener);
                         }
                     }).show();
-        }*/
+        }
 
-        /*private void showAddedMessage(Context context, String button) {
+        private void showAddedMessage(Context context, String button) {
             if (CLIPBOARD.equals(button)) {
                 new AlertDialog.Builder(context)
                         .setTitle(R.string.clipboard)
@@ -473,7 +480,7 @@ public class NavBarEditor extends TunerPreferenceFragment implements TunerServic
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
             }
-        }*/
+        }
 
         private void bindClick(View view, Holder holder) {
             view.setOnClickListener(this);

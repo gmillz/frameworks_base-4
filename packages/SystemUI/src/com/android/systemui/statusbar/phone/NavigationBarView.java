@@ -131,6 +131,13 @@ public class NavigationBarView extends FrameLayout implements PluginListener<Nav
     private KeyButtonDrawable mAccessibilityIcon;
     private TintedKeyButtonDrawable mRotateSuggestionIcon;
 
+    // Extended buttons
+    private KeyButtonDrawable mPowerIcon;
+    private KeyButtonDrawable mSearchIcon;
+    private KeyButtonDrawable mMenuBigIcon;
+    private KeyButtonDrawable mImeLeftIcon;
+    private KeyButtonDrawable mImeRightIcon;
+
     private GestureHelper mGestureHelper;
     private final DeadZone mDeadZone;
     private boolean mDeadZoneConsuming = false;
@@ -301,6 +308,13 @@ public class NavigationBarView extends FrameLayout implements PluginListener<Nav
         mButtonDispatchers.put(R.id.menu_container,
                 new ButtonDispatcher(R.id.menu_container));
         mDeadZone = new DeadZone(this);
+
+        // Extended buttons
+        mButtonDispatchers.put(R.id.power, new ButtonDispatcher(R.id.power));
+        mButtonDispatchers.put(R.id.search, new ButtonDispatcher(R.id.search));
+        mButtonDispatchers.put(R.id.menu_big, new ButtonDispatcher(R.id.menu_big));
+        mButtonDispatchers.put(R.id.ime_left, new ButtonDispatcher(R.id.ime_left));
+        mButtonDispatchers.put(R.id.ime_right, new ButtonDispatcher(R.id.ime_right));
     }
 
     public BarTransitions getBarTransitions() {
@@ -431,6 +445,27 @@ public class NavigationBarView extends FrameLayout implements PluginListener<Nav
         return mButtonDispatchers.get(R.id.menu_container);
     }
 
+    // Extended buttons
+    public ButtonDispatcher getPowerButton() {
+        return mButtonDispatchers.get(R.id.power);
+    }
+
+    public ButtonDispatcher getSearchButton() {
+        return mButtonDispatchers.get(R.id.search);
+    }
+
+    public ButtonDispatcher getMenuBigButton() {
+        return mButtonDispatchers.get(R.id.menu_big);
+    }
+
+    public ButtonDispatcher getImeLeftButton() {
+        return mButtonDispatchers.get(R.id.ime_left);
+    }
+
+    public ButtonDispatcher getImeRightButton() {
+        return mButtonDispatchers.get(R.id.ime_right);
+    }
+
     public SparseArray<ButtonDispatcher> getButtonDispatchers() {
         return mButtonDispatchers;
     }
@@ -493,6 +528,13 @@ public class NavigationBarView extends FrameLayout implements PluginListener<Nav
                     false /* hasShadow */);
 
             updateRotateSuggestionButtonStyle(mRotateBtnStyle, false);
+
+            // Extended buttons
+            mPowerIcon = getDrawable(lightContext, darkContext, R.drawable.ic_sysbar_power);
+            mSearchIcon = getDrawable(lightContext, darkContext, R.drawable.ic_sysbar_search);
+            mMenuBigIcon = getDrawable(lightContext, darkContext, R.drawable.ic_sysbar_menu_big);
+            mImeLeftIcon = getDrawable(lightContext, darkContext, R.drawable.ic_sysbar_ime_left);
+            mImeRightIcon = getDrawable(lightContext, darkContext, R.drawable.ic_sysbar_ime_right);
 
             if (ALTERNATE_CAR_MODE_UI) {
                 updateCarModeIcons(ctx);
@@ -628,6 +670,13 @@ public class NavigationBarView extends FrameLayout implements PluginListener<Nav
 
         updateRecentsIcon();
 
+        // Extended buttons
+        updatePowerIcon();
+        updateSearchIcon();
+        updateMenuBigIcon();
+        updateImeLeftIcon();
+        updateImeRightIcon();
+
         // Update IME button visibility, a11y and rotate button always overrides the appearance
         final boolean showImeButton =
                 !mShowAccessibilityButton &&
@@ -646,6 +695,10 @@ public class NavigationBarView extends FrameLayout implements PluginListener<Nav
         // Update a11y button, visibility logic in state method
         setAccessibilityButtonState(mShowAccessibilityButton, mLongClickableAccessibilityButton);
         getAccessibilityButton().setImageDrawable(mAccessibilityIcon);
+
+        // Only show IME left/right buttons if keyboard is visible
+        getImeLeftButton().setVisibility(useAltBack ? View.VISIBLE : View.INVISIBLE);
+        getImeRightButton().setVisibility(useAltBack ? View.VISIBLE : View.INVISIBLE);
 
         mBarTransitions.reapplyDarkIntensity();
 
@@ -685,6 +738,9 @@ public class NavigationBarView extends FrameLayout implements PluginListener<Nav
         getBackButton().setVisibility(disableBack      ? View.INVISIBLE : View.VISIBLE);
         getHomeButton().setVisibility(disableHome      ? View.INVISIBLE : View.VISIBLE);
         getRecentsButton().setVisibility(disableRecent ? View.INVISIBLE : View.VISIBLE);
+        getPowerButton().setVisibility(View.VISIBLE);
+        getSearchButton().setVisibility(View.VISIBLE);
+        getMenuBigButton().setVisibility(View.VISIBLE);
     }
 
     public boolean inScreenPinning() {
@@ -982,6 +1038,32 @@ public class NavigationBarView extends FrameLayout implements PluginListener<Nav
         mBarTransitions.reapplyDarkIntensity();
     }
 
+    // Extended buttons
+    private void updatePowerIcon() {
+        getPowerButton().setImageDrawable(mPowerIcon);
+        mBarTransitions.reapplyDarkIntensity();
+    }
+
+    private void updateSearchIcon() {
+        getSearchButton().setImageDrawable(mSearchIcon);
+        mBarTransitions.reapplyDarkIntensity();
+    }
+
+    private void updateMenuBigIcon() {
+        getMenuBigButton().setImageDrawable(mMenuBigIcon);
+        mBarTransitions.reapplyDarkIntensity();
+    }
+
+    private void updateImeLeftIcon() {
+        getImeLeftButton().setImageDrawable(mImeLeftIcon);
+        mBarTransitions.reapplyDarkIntensity();
+    }
+
+    private void updateImeRightIcon() {
+        getImeRightButton().setImageDrawable(mImeRightIcon);
+        mBarTransitions.reapplyDarkIntensity();
+    }
+
     public boolean isVertical() {
         return mVertical;
     }
@@ -1048,6 +1130,14 @@ public class NavigationBarView extends FrameLayout implements PluginListener<Nav
         updateIcons(getContext(), mConfiguration, newConfig);
         updateRecentsIcon();
         mRecentsOnboarding.onConfigurationChanged(newConfig);
+
+        // Extended buttons
+        updatePowerIcon();
+        updateSearchIcon();
+        updateMenuBigIcon();
+        updateImeLeftIcon();
+        updateImeRightIcon();
+
         if (uiCarModeChanged || mConfiguration.densityDpi != newConfig.densityDpi
                 || mConfiguration.getLayoutDirection() != newConfig.getLayoutDirection()) {
             // If car mode or density changes, we need to reset the icons.

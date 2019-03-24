@@ -18,11 +18,15 @@ import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.KEY
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.KEY_CODE_END;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.KEY_CODE_START;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.KEY_IMAGE_DELIM;
-import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.MENU_IME_ROTATE;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.NAVSPACE;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.NAV_BAR_LEFT;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.NAV_BAR_RIGHT;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.NAV_BAR_VIEWS;
+import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.IME_LEFT;
+import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.IME_RIGHT;
+import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.POWER;
+import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.SEARCH;
+import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.MENU_BIG;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.extractButton;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.extractImage;
 import static com.android.systemui.statusbar.phone.NavigationBarInflaterView.extractKeycode;
@@ -67,6 +71,11 @@ public class NavBarTuner extends TunerPreferenceFragment {
             {R.drawable.ic_left, R.string.tuner_left},
             {R.drawable.ic_right, R.string.tuner_right},
             {R.drawable.ic_menu, R.string.tuner_menu},
+            {R.drawable.ic_sysbar_power, R.string.tuner_power},
+            {R.drawable.ic_sysbar_search, R.string.tuner_search},
+            {R.drawable.ic_sysbar_camera, R.string.tuner_camera},
+            {R.drawable.ic_sysbar_notifications, R.string.tuner_notifications},
+            {R.drawable.ic_sysbar_null, R.string.tuner_null},
     };
 
     private final ArrayList<Tunable> mTunables = new ArrayList<>();
@@ -87,7 +96,7 @@ public class NavBarTuner extends TunerPreferenceFragment {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.nav_bar_tuner);
-        bindLayout((ListPreference) findPreference(LAYOUT));
+        //bindLayout((ListPreference) findPreference(LAYOUT));
         //bindButton(NAV_BAR_LEFT, NAVSPACE, LEFT);
         //bindButton(NAV_BAR_RIGHT, MENU_IME_ROTATE, RIGHT);
     }

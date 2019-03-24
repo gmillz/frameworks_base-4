@@ -59,15 +59,17 @@ public class NavigationBarInflaterView extends FrameLayout
     public static final String NAV_BAR_LEFT = "sysui_nav_bar_left";
     public static final String NAV_BAR_RIGHT = "sysui_nav_bar_right";
 
-    public static final String MENU_IME_ROTATE = "menu_ime";
     public static final String BACK = "back";
     public static final String HOME = "home";
     public static final String RECENT = "recent";
+    public static final String MENU_BIG = "menu_big";
+    public static final String IME_LEFT = "ime_left";
+    public static final String IME_RIGHT = "ime_right";
     public static final String NAVSPACE = "space";
     public static final String CLIPBOARD = "clipboard";
+    public static final String POWER = "power";
+    public static final String SEARCH = "search";
     public static final String KEY = "key";
-    public static final String LEFT = "left";
-    public static final String RIGHT = "right";
     public static final String CONTEXTUAL = "contextual";
 
     public static final String GRAVITY_SEPARATOR = ";";
@@ -367,13 +369,6 @@ public class NavigationBarInflaterView extends FrameLayout
     private View createView(String buttonSpec, ViewGroup parent, LayoutInflater inflater) {
         View v = null;
         String button = extractButton(buttonSpec);
-        if (LEFT.equals(button)) {
-            String s = Dependency.get(TunerService.class).getValue(NAV_BAR_LEFT, NAVSPACE);
-            button = extractButton(s);
-        } else if (RIGHT.equals(button)) {
-            String s = Dependency.get(TunerService.class).getValue(NAV_BAR_RIGHT, MENU_IME_ROTATE);
-            button = extractButton(s);
-        }
         // Let plugins go first so they can override a standard view if they want.
         for (NavBarButtonProvider provider : mPlugins) {
             v = provider.createView(buttonSpec, parent);
@@ -385,14 +380,22 @@ public class NavigationBarInflaterView extends FrameLayout
             v = inflater.inflate(R.layout.back, parent, false);
         } else if (RECENT.equals(button)) {
             v = inflater.inflate(R.layout.recent_apps, parent, false);
-        } else if (MENU_IME_ROTATE.equals(button)) {
-            v = inflater.inflate(R.layout.menu_ime, parent, false);
+        } else if (MENU_BIG.equals(button)) {
+            v = inflater.inflate(R.layout.menu_big, parent, false);
         } else if (NAVSPACE.equals(button)) {
             v = inflater.inflate(R.layout.nav_key_space, parent, false);
         } else if (CLIPBOARD.equals(button)) {
             v = inflater.inflate(R.layout.clipboard, parent, false);
         } else if (CONTEXTUAL.equals(button)) {
             v = inflater.inflate(R.layout.contextual, parent, false);
+        } else if (POWER.equals(button)) {
+            v = inflater.inflate(R.layout.power, parent, false);
+        } else if (IME_LEFT.equals(button)) {
+            v = inflater.inflate(R.layout.ime_left, parent, false);
+        } else if (IME_RIGHT.equals(button)) {
+            v = inflater.inflate(R.layout.ime_right, parent, false);
+        } else if (SEARCH.equals(button)) {
+            v = inflater.inflate(R.layout.search, parent, false);
         } else if (button.startsWith(KEY)) {
             String uri = extractImage(button);
             int code = extractKeycode(button);
