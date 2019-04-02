@@ -3712,6 +3712,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         final int flags = event.getFlags();
         final boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
         final boolean canceled = event.isCanceled();
+        final boolean interactive = (policyFlags & FLAG_INTERACTIVE) != 0;
+        final boolean isAsylumSource = event.getSource() == InputDevice.SOURCE_ASYLUM;
 
         if (DEBUG_INPUT) {
             Log.d(TAG, "interceptKeyTi keyCode=" + keyCode + " down=" + down + " repeatCount="
@@ -3719,7 +3721,17 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     + " canceled=" + canceled);
         }
 
-
+        if (mHardwareKeyHandler != null && !isAsylumSource) {
+            if (mHardwareKeyHandler.handleKeyBeforeDispatching(event, keyguardOn, interactive)) {
+                if (DEBUG_INPUT) {
+                    Log.d(TAG, "Handled by Asylum, stopping here for now");
+                }
+                return 0;
+            }
+            if (DEBUG_INPUT) {
+                Log.d(TAG, "Not handled by Asylum, continuing...");
+            }
+        }
 
         // If we think we might have a volume down & power key chord on the way
         // but we're not sure, then tell the dispatcher to wait a little while and
@@ -6196,7 +6208,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
 
         if (mHardwareKeyHandler != null && !isAsylumSource) {
-            if (mHardwareKeyHandler.handleKeyEvent(event, keyguardActive, interactive)) {
+            if (mHardwareKeyHandler.handleKeyBeforeQueueing(event, keyguardActive, interactive)) {
                 if (DEBUG_INPUT) {
                     Log.d(TAG, "Handled by Asylum, stopping here for now");
                 }
