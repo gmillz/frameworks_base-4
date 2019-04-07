@@ -47,7 +47,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.settingslib.Utils;
-import com.android.systemui.BatteryMeterView;
+import com.android.systemui.statusbar.asylum.BatteryMeterView;
 import com.android.systemui.Dependency;
 import com.android.systemui.Prefs;
 import com.android.systemui.R;
@@ -65,6 +65,8 @@ import com.android.systemui.statusbar.policy.NextAlarmController;
 import com.android.systemui.statusbar.policy.ZenModeController;
 import com.android.systemui.tuner.TunerService;
 import com.android.systemui.tuner.TunerService.Tunable;
+
+import com.android.systemui.statusbar.asylum.BatteryContainer;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -118,7 +120,7 @@ public class QuickStatusBarHeader extends RelativeLayout implements
     private View mStatusSeparator;
     private ImageView mRingerModeIcon;
     private TextView mRingerModeTextView;
-    private BatteryMeterView mBatteryMeterView;
+    private BatteryContainer mBatteryContainer;
     private Clock mClockView;
     private DateView mDateView;
 
@@ -181,9 +183,8 @@ public class QuickStatusBarHeader extends RelativeLayout implements
         // Set the correct tint for the status icons so they contrast
         mIconManager.setTint(fillColor);
 
-        mBatteryMeterView = findViewById(R.id.battery);
-        mBatteryMeterView.setForceShowPercent(true);
-        mBatteryMeterView.setOnClickListener(this);
+        mBatteryContainer = findViewById(R.id.battery_container);
+        //mBatteryContainer.setIsQuickSettings(true);
         mClockView = findViewById(R.id.clock);
         mClockView.setOnClickListener(this);
         mClockView.setClockHideableByUser(false);
@@ -264,7 +265,7 @@ public class QuickStatusBarHeader extends RelativeLayout implements
         // Update color schemes in landscape to use wallpaperTextColor
         boolean shouldUseWallpaperTextColor =
                 newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE;
-        mBatteryMeterView.useWallpaperTextColor(shouldUseWallpaperTextColor);
+        //mBatteryMeterView.useWallpaperTextColor(shouldUseWallpaperTextColor);
         mClockView.useWallpaperTextColor(shouldUseWallpaperTextColor);
     }
 
@@ -446,7 +447,7 @@ public class QuickStatusBarHeader extends RelativeLayout implements
         if (v == mClockView) {
             Dependency.get(ActivityStarter.class).postStartActivityDismissingKeyguard(new Intent(
                     AlarmClock.ACTION_SHOW_ALARMS),0);
-        } else if (v == mBatteryMeterView) {
+        } else if (v == mBatteryContainer) {
             Dependency.get(ActivityStarter.class).postStartActivityDismissingKeyguard(new Intent(
                     Intent.ACTION_POWER_USAGE_SUMMARY),0);
         }
@@ -603,8 +604,7 @@ public class QuickStatusBarHeader extends RelativeLayout implements
         mHeaderQsPanel.setHost(host, null /* No customization in header */);
 
         // Use SystemUI context to get battery meter colors, and let it use the default tint (white)
-        mBatteryMeterView.setColorsFromContext(mHost.getContext());
-        mBatteryMeterView.onDarkChanged(new Rect(), 0, DarkIconDispatcher.DEFAULT_ICON_TINT);
+        mBatteryContainer.setIsQS(mHost.getContext(), true);
     }
 
     public void setCallback(Callback qsPanelCallback) {
